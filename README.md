@@ -1,2 +1,2 @@
 # dotfiles
-manage vimrc....
+manage my dotfiles.
