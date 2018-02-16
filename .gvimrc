@@ -4,7 +4,7 @@ scriptencoding utf-8
 " An example for a Japanese version vimrc file.
 " 日本語版のデフォルト設定ファイル(vimrc) - Vim 7.4
 "
-" Last Change: 27-Dec-2016.
+" Last Change: 16-Feb-2018.
 " Maintainer:  MURAOKA Taro <koron.kaoriya@gmail.com>
 "
 " 解説:
@@ -132,7 +132,7 @@ set smartcase
 " 編集に関する設定:
 "
 " タブの画面上での幅
-set tabstop=8
+set tabstop=4
 " タブをスペースに展開しない (expandtab:展開する)
 set noexpandtab
 " 自動的にインデントする (noautoindent:インデントしない)
@@ -287,8 +287,7 @@ if !isdirectory($HOME . '/vimfiles/autoload')
   call mkdir($HOME . '/vimfiles/autoload', 'p')
 endif
 
-if !filereadable($HOME . '/vimfiles/autoload/plug.vim')
-endif
+if filereadable($HOME . '/vimfiles/autoload/plug.vim')
 
 call plug#begin($HOME . '/vimfiles/plugged')
 
@@ -296,3 +295,5 @@ Plug 'scrooloose/nerdtree'
 Plug 'jistr/vim-nerdtree-tabs'
 
 call plug#end()
+
+endif
