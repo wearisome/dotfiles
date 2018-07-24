@@ -289,7 +289,13 @@ augroup MyXML
   autocmd Filetype html inoremap <buffer> </ </<C-x><C-o>
 augroup END
 
-if &runtimepath =~# '/Plug.vim'
+if filereadable($HOME . '/vimfiles/autoload/plug.vim')
+  if &runtimepath !~# '/plug.vim'
+    set runtimepath+=$HOME/vimfiles/autoload/plug.vim
+  endif
+endif
+
+if &runtimepath =~# '/plug.vim'
   call plug#begin('~/.vim/plugged')
   Plug 'junegunn/seoul256.vim'
   Plug 'junegunn/goyo.vim'
