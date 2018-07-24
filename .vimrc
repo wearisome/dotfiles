@@ -289,12 +289,13 @@ augroup MyXML
   autocmd Filetype html inoremap <buffer> </ </<C-x><C-o>
 augroup END
 
-call plug#begin('~/.vim/plugged')
-Plug 'junegunn/seoul256.vim'
-Plug 'junegunn/goyo.vim'
-Plug 'junegunn/limelight.vim'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-call plug#end()
-
-let g:NERDTreeShowBookmarks=1
-map <C-e> :NERDTreeToggle<CR>
+if &runtimepath =~# '/Plug.vim'
+  call plug#begin('~/.vim/plugged')
+  Plug 'junegunn/seoul256.vim'
+  Plug 'junegunn/goyo.vim'
+  Plug 'junegunn/limelight.vim'
+  Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+  call plug#end()
+  let g:NERDTreeShowBookmarks=1
+  map <C-e> :NERDTreeToggle<CR>
+endif
