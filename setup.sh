@@ -1,16 +1,13 @@
 #!/bin/bash
 
-DOT_FILES=(.gvimrc)
+DOT_FILES=(.vimrc)
 
 for file in ${DOT_FILES[@]}
 do
 	ln -s $HOME/dotfiles/$file $HOME/$file
 done
 
-if [ ! -e $HOME/.cache/dein/repos/github.com/Shougo/dein.vim ]; then
-	git clone https://github.com/Shougo/dein.vim $HOME/.cache/dein/repos/github.com/Shougo/dein.vim
-fi
 if [ ! -e $HOME/.cache/dein/repos/github.com/Shougo/deoplete.vim ]; then
-	git clone https://github.com/Shougo/dein.vim $HOME/.cache/dein/repos/github.com/Shougo/deoplete.vim
+	curl -fLo ~/vimfiles/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
