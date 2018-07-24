@@ -4,7 +4,7 @@ scriptencoding utf-8
 " An example for a Japanese version vimrc file.
 " 日本語版のデフォルト設定ファイル(vimrc) - Vim 7.4
 "
-" Last Change: 16-Feb-2018.
+" Last Change: 24-Jul-2018.
 " Maintainer:  MURAOKA Taro <koron.kaoriya@gmail.com>
 "
 " 解説:
@@ -56,12 +56,14 @@ if 1 && exists('$HOME') && filereadable($HOME . '/.vimrc_first.vim')
 endif
 
 " plugins下のディレクトリをruntimepathへ追加する。
-for s:path in split(glob($VIM.'/plugins/*'), '\n')
-  if s:path !~# '\~$' && isdirectory(s:path)
-    let &runtimepath = &runtimepath.','.s:path
-  end
-endfor
-unlet s:path
+if isdirectory($VIM.'/plugins/')
+  for s:path in split(glob($VIM.'/plugins/*'), '\n')
+    if s:path !~# '\~$' && isdirectory(s:path)
+      let &runtimepath = &runtimepath.','.s:path
+    end
+  endfor
+  unlet s:path
+endif
 
 "---------------------------------------------------------------------------
 " 日本語対応のための設定:
@@ -69,7 +71,9 @@ unlet s:path
 " ファイルを読込む時にトライする文字エンコードの順序を確定する。漢字コード自
 " 動判別機能を利用する場合には別途iconv.dllが必要。iconv.dllについては
 " README_w32j.txtを参照。ユーティリティスクリプトを読み込むことで設定される。
-source $VIM/plugins/kaoriya/encode_japan.vim
+if filereadable($VIM.'/plugins/kaoriya/encode_japan.vim')
+  source $VIM/plugins/kaoriya/encode_japan.vim
+endif
 " メッセージを日本語にする (Windowsでは自動的に判断・設定されている)
 if !(has('win32') || has('mac')) && has('multi_lang')
   if !exists('$LANG') || $LANG.'X' ==# 'X'
@@ -229,22 +233,24 @@ endif
 "---------------------------------------------------------------------------
 " KaoriYaでバンドルしているプラグインのための設定
 
-" autofmt: 日本語文章のフォーマット(折り返し)プラグイン.
-set formatexpr=autofmt#japanese#formatexpr()
-
-" vimdoc-ja: 日本語ヘルプを無効化する.
-if kaoriya#switch#enabled('disable-vimdoc-ja')
-  let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]vimdoc-ja"'), ',')
-endif
-
-" vimproc: 同梱のvimprocを無効化する
-if kaoriya#switch#enabled('disable-vimproc')
-  let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]vimproc$"'), ',')
-endif
-
-" go-extra: 同梱の vim-go-extra を無効化する
-if kaoriya#switch#enabled('disable-go-extra')
-  let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]golang$"'), ',')
+if has('kaoriya')
+  " autofmt: 日本語文章のフォーマット(折り返し)プラグイン.
+  set formatexpr=autofmt#japanese#formatexpr()
+  
+  " vimdoc-ja: 日本語ヘルプを無効化する.
+  if kaoriya#switch#enabled('disable-vimdoc-ja')
+    let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]vimdoc-ja"'), ',')
+  endif
+  
+  " vimproc: 同梱のvimprocを無効化する
+  if kaoriya#switch#enabled('disable-vimproc')
+    let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]vimproc$"'), ',')
+  endif
+  
+  " go-extra: 同梱の vim-go-extra を無効化する
+  if kaoriya#switch#enabled('disable-go-extra')
+    let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]golang$"'), ',')
+  endif
 endif
 
 " Copyright (C) 2009-2016 KaoriYa/MURAOKA Taro
@@ -283,17 +289,12 @@ augroup MyXML
   autocmd Filetype html inoremap <buffer> </ </<C-x><C-o>
 augroup END
 
-if !isdirectory($HOME . '/vimfiles/autoload')
-  call mkdir($HOME . '/vimfiles/autoload', 'p')
-endif
-
-if filereadable($HOME . '/vimfiles/autoload/plug.vim')
-
-call plug#begin($HOME . '/vimfiles/plugged')
-
-Plug 'scrooloose/nerdtree'
-Plug 'jistr/vim-nerdtree-tabs'
-
+call plug#begin('~/.vim/plugged')
+Plug 'junegunn/seoul256.vim'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/limelight.vim'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
 
-endif
+let g:NERDTreeShowBookmarks=1
+map <C-e> :NERDTreeToggle<CR>
