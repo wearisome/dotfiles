@@ -1,69 +1,14 @@
 scriptencoding utf-8
-" vim:set ts=8 sts=2 sw=2 tw=0: (この行に関しては:help modelineを参照)
-"
-" An example for a Japanese version vimrc file.
-" 日本語版のデフォルト設定ファイル(vimrc) - Vim 7.4
-"
-" Last Change: 24-Jul-2018.
-" Maintainer:  MURAOKA Taro <koron.kaoriya@gmail.com>
-"
-" 解説:
-" このファイルにはVimの起動時に必ず設定される、編集時の挙動に関する設定が書
-" かれています。GUIに関する設定はgvimrcに書かかれています。
-"
-" 個人用設定は_vimrcというファイルを作成しそこで行ないます。_vimrcはこのファ
-" イルの後に読込まれるため、ここに書かれた内容を上書きして設定することが出来
-" ます。_vimrcは$HOMEまたは$VIMに置いておく必要があります。$HOMEは$VIMよりも
-" 優先され、$HOMEでみつかった場合$VIMは読込まれません。
-"
-" 管理者向けに本設定ファイルを直接書き換えずに済ませることを目的として、サイ
-" トローカルな設定を別ファイルで行なえるように配慮してあります。Vim起動時に
-" サイトローカルな設定ファイル($VIM/vimrc_local.vim)が存在するならば、本設定
-" ファイルの主要部分が読み込まれる前に自動的に読み込みます。
-"
-" 読み込み後、変数g:vimrc_local_finishが非0の値に設定されていた場合には本設
-" 定ファイルに書かれた内容は一切実行されません。デフォルト動作を全て差し替え
-" たい場合に利用して下さい。
-"
-" 参考:
-"   :help vimrc
-"   :echo $HOME
-"   :echo $VIM
-"   :version
 
-"---------------------------------------------------------------------------
-" サイトローカルな設定($VIM/vimrc_local.vim)があれば読み込む。読み込んだ後に
-" 変数g:vimrc_local_finishに非0な値が設定されていた場合には、それ以上の設定
-" ファイルの読込を中止する。
-if 1 && filereadable($VIM . '/vimrc_local.vim')
-  unlet! g:vimrc_local_finish
-  source $VIM/vimrc_local.vim
-  if exists('g:vimrc_local_finish') && g:vimrc_local_finish != 0
-    finish
-  endif
-endif
-
-"---------------------------------------------------------------------------
-" ユーザ優先設定($HOME/.vimrc_first.vim)があれば読み込む。読み込んだ後に変数
-" g:vimrc_first_finishに非0な値が設定されていた場合には、それ以上の設定ファ
-" イルの読込を中止する。
-if 1 && exists('$HOME') && filereadable($HOME . '/.vimrc_first.vim')
-  unlet! g:vimrc_first_finish
-  source $HOME/.vimrc_first.vim
-  if exists('g:vimrc_first_finish') && g:vimrc_first_finish != 0
-    finish
-  endif
-endif
-
-" plugins下のディレクトリをruntimepathへ追加する。
-if isdirectory($VIM.'/plugins/')
-  for s:path in split(glob($VIM.'/plugins/*'), '\n')
+" $HOME/vimfiles/autoload配下のディレクトリをruntimepathへ追加する。
+if isdirectory($HOME.'/vimfiles/autoload/')
+  for s:path in split(glob($HOME.'/autoload/*'), '\n')
     if s:path !~# '\~$' && isdirectory(s:path)
       let &runtimepath = &runtimepath.','.s:path
     end
   endfor
-  unlet s:path
 endif
+
 
 "---------------------------------------------------------------------------
 " 日本語対応のための設定:
@@ -71,33 +16,35 @@ endif
 " ファイルを読込む時にトライする文字エンコードの順序を確定する。漢字コード自
 " 動判別機能を利用する場合には別途iconv.dllが必要。iconv.dllについては
 " README_w32j.txtを参照。ユーティリティスクリプトを読み込むことで設定される。
-if filereadable($VIM.'/plugins/kaoriya/encode_japan.vim')
-  source $VIM/plugins/kaoriya/encode_japan.vim
-endif
-" メッセージを日本語にする (Windowsでは自動的に判断・設定されている)
-if !(has('win32') || has('mac')) && has('multi_lang')
-  if !exists('$LANG') || $LANG.'X' ==# 'X'
-    if !exists('$LC_CTYPE') || $LC_CTYPE.'X' ==# 'X'
-      language ctype ja_JP.eucJP
-    endif
-    if !exists('$LC_MESSAGES') || $LC_MESSAGES.'X' ==# 'X'
-      language messages ja_JP.eucJP
+if has('kaoriya')
+  if filereadable($VIM.'/plugins/kaoriya/encode_japan.vim')
+    source $VIM/plugins/kaoriya/encode_japan.vim
+  endif
+  " メッセージを日本語にする (Windowsでは自動的に判断・設定されている)
+  if !(has('win32') || has('mac')) && has('multi_lang')
+    if !exists('$LANG') || $LANG.'X' ==# 'X'
+      if !exists('$LC_CTYPE') || $LC_CTYPE.'X' ==# 'X'
+        language ctype ja_JP.eucJP
+      endif
+      if !exists('$LC_MESSAGES') || $LC_MESSAGES.'X' ==# 'X'
+        language messages ja_JP.eucJP
+      endif
     endif
   endif
-endif
-" MacOS Xメニューの日本語化 (メニュー表示前に行なう必要がある)
-if has('mac')
-  set langmenu=japanese
-endif
-" 日本語入力用のkeymapの設定例 (コメントアウト)
-if has('keymap')
-  " ローマ字仮名のkeymap
-  "silent! set keymap=japanese
-  "set iminsert=0 imsearch=0
-endif
-" 非GUI日本語コンソールを使っている場合の設定
-if !has('gui_running') && &encoding != 'cp932' && &term == 'win32'
-  set termencoding=cp932
+  " MacOS Xメニューの日本語化 (メニュー表示前に行なう必要がある)
+  if has('mac')
+    set langmenu=japanese
+  endif
+  " 日本語入力用のkeymapの設定例 (コメントアウト)
+  if has('keymap')
+    " ローマ字仮名のkeymap
+    "silent! set keymap=japanese
+    "set iminsert=0 imsearch=0
+  endif
+  " 非GUI日本語コンソールを使っている場合の設定
+  if !has('gui_running') && &encoding != 'cp932' && &term == 'win32'
+    set termencoding=cp932
+  endif
 endif
 
 "---------------------------------------------------------------------------
@@ -109,18 +56,20 @@ endif
 "---------------------------------------------------------------------------
 " Bram氏の提供する設定例をインクルード (別ファイル:vimrc_example.vim)。これ
 " 以前にg:no_vimrc_exampleに非0な値を設定しておけばインクルードはしない。
-if 1 && (!exists('g:no_vimrc_example') || g:no_vimrc_example == 0)
-  if &guioptions !~# "M"
-    " vimrc_example.vimを読み込む時はguioptionsにMフラグをつけて、syntax on
-    " やfiletype plugin onが引き起こすmenu.vimの読み込みを避ける。こうしない
-    " とencに対応するメニューファイルが読み込まれてしまい、これの後で読み込
-    " まれる.vimrcでencが設定された場合にその設定が反映されずメニューが文字
-    " 化けてしまう。
-    set guioptions+=M
-    source $VIMRUNTIME/vimrc_example.vim
-    set guioptions-=M
-  else
-    source $VIMRUNTIME/vimrc_example.vim
+if has('kaoriya')
+  if 1 && (!exists('g:no_vimrc_example') || g:no_vimrc_example == 0)
+    if &guioptions !~# "M"
+      " vimrc_example.vimを読み込む時はguioptionsにMフラグをつけて、syntax on
+      " やfiletype plugin onが引き起こすmenu.vimの読み込みを避ける。こうしない
+      " とencに対応するメニューファイルが読み込まれてしまい、これの後で読み込
+      " まれる.vimrcでencが設定された場合にその設定が反映されずメニューが文字
+      " 化けてしまう。
+      set guioptions+=M
+      source $VIMRUNTIME/vimrc_example.vim
+      set guioptions-=M
+    else
+      source $VIMRUNTIME/vimrc_example.vim
+    endif
   endif
 endif
 
@@ -136,9 +85,9 @@ set smartcase
 " 編集に関する設定:
 "
 " タブの画面上での幅
-set tabstop=4
+set tabstop=2
 " タブをスペースに展開しない (expandtab:展開する)
-set noexpandtab
+set expandtab
 " 自動的にインデントする (noautoindent:インデントしない)
 set autoindent
 " バックスペースでインデントや改行を削除できるようにする
@@ -253,10 +202,7 @@ if has('kaoriya')
   endif
 endif
 
-" Copyright (C) 2009-2016 KaoriYa/MURAOKA Taro
-
 "----------------------------------------------------------------------------
-" 2016/07/29 Tomita add
 
 " swapファイルの出力先を変更する
 if !isdirectory($HOME . '/vimfiles/swap')
@@ -271,10 +217,18 @@ endif
 set backupdir=$HOME/vimfiles/backup
 
 " viminfoファイルの出力先を変更する
-if !isdirectory($HOME . '/vimfiles/viminfo')
-  call mkdir($HOME . '/vimfiles/viminfo', 'p')
+if !has('nvim')
+  if !isdirectory($HOME . '/vimfiles/viminfo')
+    call mkdir($HOME . '/vimfiles/viminfo', 'p')
+  endif
+  set viminfo+=n$HOME/vimfiles/viminfo/viminfo
+else
+  if !isdirectory($HOME . '/vimfiles/nviminfo')
+    call mkdir($HOME . '/vimfiles/nviminfo', 'p')
+  endif
+  set viminfo+=n$HOME/vimfiles/nviminfo/viminfo
 endif
-set viminfo+=n$HOME/vimfiles/viminfo/viminfo
+
 
 " undoファイルの出力先を変更する
 if !isdirectory($HOME . '/vimfiles/undo')
@@ -289,21 +243,63 @@ augroup MyXML
   autocmd Filetype html inoremap <buffer> </ </<C-x><C-o>
 augroup END
 
-if filereadable($HOME . '/vimfiles/autoload/plug.vim')
-  if &runtimepath !~# '/plug.vim'
-    set runtimepath+=$HOME/vimfiles/autoload/plug.vim
+if has('nvim')
+  let g:python3_host_prog = $LOCALAPPDATA . '/Programs/Python/Python37-32/python.exe'
+  "dein Scripts-----------------------------
+  if &compatible
+    set nocompatible               " Be iMproved
   endif
-endif
+  
+  " Required:
+  set runtimepath+=$HOME/.cache/dein/repos/github.com/Shougo/dein.vim
+  
+  " Required:
+  if dein#load_state($HOME.'/.cache/dein')
+    call dein#begin($HOME.'/.cache/dein')
+  
+    " Let dein manage dein
+    " Required:
+    call dein#add($HOME.'/.cache/dein/repos/github.com/Shougo/dein.vim')
+  
+    " Load toml
+    if $XDG_CONFIG_HOME ==? ''
+      let $XDG_CONFIG_HOME = $LOCALAPPDATA
+    endif
+    if $XDG_CONFIG_HOME ==? ''
+      let $XDG_CONFIG_HOME = $HOME/.config
+    endif
+    let s:toml_dir = $XDG_CONFIG_HOME . '/nvim'
+    let s:toml = s:toml_dir . '/dein.toml'
+    let s:lazy_toml = s:toml_dir . '/dein_lazy.toml'
+    if filereadable(s:toml)
+      call dein#load_toml(s:toml, {'lazy': 0})
+    endif
+    if filereadable(s:lazy_toml)
+      call dein#load_toml(s:lazy_toml, {'lazy': 1})
+    endif
+    " Add or remove your plugins here:
+    call dein#add('Shougo/neosnippet.vim')
+    call dein#add('Shougo/neosnippet-snippets')
+    call dein#add('Shougo/deoplete.nvim')
+    let g:deoplete#enable_at_startup = 1
+  
+    " You can specify revision/branch/tag.
+    call dein#add('Shougo/deol.nvim', { 'rev': '01203d4c9' })
+  
+    " Required:
+    call dein#end()
+    call dein#save_state()
+  endif
+  
+  " Required:
+  filetype plugin indent on
+  syntax enable
+  
+  " If you want to install not installed plugins on startup.
+  if dein#check_install()
+    call dein#install()
+  endif
+  
+  "End dein Scripts-------------------------
 
-if has('kaoriya')
-  if &runtimepath =~# '/plug.vim'
-    call plug#begin('~/.vim/plugged')
-    Plug 'junegunn/seoul256.vim'
-    Plug 'junegunn/goyo.vim'
-    Plug 'junegunn/limelight.vim'
-    Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-    call plug#end()
-    let g:NERDTreeShowBookmarks=1
-    map <C-e> :NERDTreeToggle<CR>
-  endif
 endif
