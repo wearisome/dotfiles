@@ -295,13 +295,15 @@ if filereadable($HOME . '/vimfiles/autoload/plug.vim')
   endif
 endif
 
-if &runtimepath =~# '/plug.vim'
-  call plug#begin('~/.vim/plugged')
-  Plug 'junegunn/seoul256.vim'
-  Plug 'junegunn/goyo.vim'
-  Plug 'junegunn/limelight.vim'
-  Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-  call plug#end()
-  let g:NERDTreeShowBookmarks=1
-  map <C-e> :NERDTreeToggle<CR>
+if has('kaoriya')
+  if &runtimepath =~# '/plug.vim'
+    call plug#begin('~/.vim/plugged')
+    Plug 'junegunn/seoul256.vim'
+    Plug 'junegunn/goyo.vim'
+    Plug 'junegunn/limelight.vim'
+    Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+    call plug#end()
+    let g:NERDTreeShowBookmarks=1
+    map <C-e> :NERDTreeToggle<CR>
+  endif
 endif
