@@ -4,11 +4,26 @@ DOT_FILES=(.vimrc)
 
 for file in ${DOT_FILES[@]}
 do
-	ln -s $HOME/dotfiles/$file $HOME/$file
+  cp -f $HOME/dotfiles/$file $HOME/$file
+  if [ ".vimrc" = $file ]; then
+    if [ -z $XDG_CONFIG_HOME ]; then
+      export XDG_CONFIG_HOME=$LOCALAPPDATA
+    fi
+    if [ -z $XDG_CONFIG_HOME ]; then
+      export XDG_CONFIG_HOME=$HOME/.config
+    fi
+    cp -f $HOME/dotfiles/$file $XDG_CONFIG_HOME/nvim/init.vim
+  fi
 done
 
-if [ ! -e $HOME/vimfiles/autoload/plug.vim ]; then
-	mkdir -p $HOME/vimfiles/autoload
-	curl -fLo ~/vimfiles/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-fi
-
+TOML_FILES=(dein.toml dein_lazy.toml)
+for file in ${TOML_FILES[@]}
+do
+  if [ -z $XDG_CONFIG_HOME ]; then
+    export XDG_CONFIG_HOME=$LOCALAPPDATA
+  fi
+  if [ -z $XDG_CONFIG_HOME ]; then
+    export XDG_CONFIG_HOME=$HOME/.config
+  fi
+  cp -f $HOME/dotfiles/$file $XDG_CONFIG_HOME/nvim/$file
+done
