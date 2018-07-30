@@ -2,6 +2,11 @@
 
 DOT_FILES=(.vimrc)
 
+if [ ! -e $HOME'/.cache/dein' ]; then
+  curl https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh > installer.sh
+  bash installer.sh $HOME.'/.cache/dein'
+fi
+
 for file in ${DOT_FILES[@]}
 do
   cp -f $HOME/dotfiles/$file $HOME/$file
