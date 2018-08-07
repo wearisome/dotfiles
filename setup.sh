@@ -11,6 +11,7 @@ for file in ${DOT_FILES[@]}
 do
   cp -f $HOME/dotfiles/$file $HOME/$file
   if [ ".vimrc" = $file ]; then
+    cp -f $HOME/dotfiles/$file $HOME/_vsvimrc
     if [ -z $XDG_CONFIG_HOME ]; then
       export XDG_CONFIG_HOME=$LOCALAPPDATA
     fi
