@@ -1,77 +1,8 @@
 scriptencoding utf-8
 
-" $HOME/vimfiles/autoload配下のディレクトリをruntimepathへ追加する。
-if isdirectory($HOME.'/vimfiles/autoload/')
-  for s:path in split(glob($HOME.'/autoload/*'), '\n')
-    if s:path !~# '\~$' && isdirectory(s:path)
-      let &runtimepath = &runtimepath.','.s:path
-    end
-  endfor
-endif
-
-
-"---------------------------------------------------------------------------
-" 日本語対応のための設定:
-"
-" ファイルを読込む時にトライする文字エンコードの順序を確定する。漢字コード自
-" 動判別機能を利用する場合には別途iconv.dllが必要。iconv.dllについては
-" README_w32j.txtを参照。ユーティリティスクリプトを読み込むことで設定される。
-if has('kaoriya')
-  if filereadable($VIM.'/plugins/kaoriya/encode_japan.vim')
-    source $VIM/plugins/kaoriya/encode_japan.vim
-  endif
-  " メッセージを日本語にする (Windowsでは自動的に判断・設定されている)
-  if !(has('win32') || has('mac')) && has('multi_lang')
-    if !exists('$LANG') || $LANG.'X' ==# 'X'
-      if !exists('$LC_CTYPE') || $LC_CTYPE.'X' ==# 'X'
-        language ctype ja_JP.eucJP
-      endif
-      if !exists('$LC_MESSAGES') || $LC_MESSAGES.'X' ==# 'X'
-        language messages ja_JP.eucJP
-      endif
-    endif
-  endif
-  " MacOS Xメニューの日本語化 (メニュー表示前に行なう必要がある)
-  if has('mac')
-    set langmenu=japanese
-  endif
-  " 日本語入力用のkeymapの設定例 (コメントアウト)
-  if has('keymap')
-    " ローマ字仮名のkeymap
-    "silent! set keymap=japanese
-    "set iminsert=0 imsearch=0
-  endif
-  " 非GUI日本語コンソールを使っている場合の設定
-  if !has('gui_running') && &encoding != 'cp932' && &term == 'win32'
-    set termencoding=cp932
-  endif
-endif
-
-"---------------------------------------------------------------------------
-" メニューファイルが存在しない場合は予め'guioptions'を調整しておく
-if 1 && !filereadable($VIMRUNTIME . '/menu.vim') && has('gui_running')
-  set guioptions+=M
-endif
-
-"---------------------------------------------------------------------------
-" Bram氏の提供する設定例をインクルード (別ファイル:vimrc_example.vim)。これ
-" 以前にg:no_vimrc_exampleに非0な値を設定しておけばインクルードはしない。
-if has('kaoriya')
-  if 1 && (!exists('g:no_vimrc_example') || g:no_vimrc_example == 0)
-    if &guioptions !~# "M"
-      " vimrc_example.vimを読み込む時はguioptionsにMフラグをつけて、syntax on
-      " やfiletype plugin onが引き起こすmenu.vimの読み込みを避ける。こうしない
-      " とencに対応するメニューファイルが読み込まれてしまい、これの後で読み込
-      " まれる.vimrcでencが設定された場合にその設定が反映されずメニューが文字
-      " 化けてしまう。
-      set guioptions+=M
-      source $VIMRUNTIME/vimrc_example.vim
-      set guioptions-=M
-    else
-      source $VIMRUNTIME/vimrc_example.vim
-    endif
-  endif
-endif
+set encoding=utf-8
+set fileencoding=utf-8
+set fileencodings=utf-8,cp932,utf-16le,euc-jp
 
 "---------------------------------------------------------------------------
 " 検索の挙動に関する設定:
@@ -116,7 +47,7 @@ set nolist
 "set listchars=tab:>-,extends:<,trail:-,eol:<
 " 長い行を折り返して表示 (nowrap:折り返さない)
 " set wrap
-set nowrap
+set wrap
 " 常にステータス行を表示 (詳細は:he laststatus)
 set laststatus=2
 " コマンドラインの高さ (Windows用gvim使用時はgvimrcを編集すること)
@@ -127,12 +58,6 @@ set showcmd
 set title
 " 画面を黒地に白にする (次行の先頭の " を削除すれば有効になる)
 "colorscheme evening " (Windows用gvim使用時はgvimrcを編集すること)
-
-"---------------------------------------------------------------------------
-" ファイル操作に関する設定:
-"
-" バックアップファイルを作成しない (次行の先頭の " を削除すれば有効になる)
-"set nobackup
 
 
 "---------------------------------------------------------------------------
@@ -179,62 +104,53 @@ if has('mac')
   set iskeyword=@,48-57,_,128-167,224-235
 endif
 
-"---------------------------------------------------------------------------
-" KaoriYaでバンドルしているプラグインのための設定
-
-if has('kaoriya')
-  " autofmt: 日本語文章のフォーマット(折り返し)プラグイン.
-  set formatexpr=autofmt#japanese#formatexpr()
-  
-  " vimdoc-ja: 日本語ヘルプを無効化する.
-  if kaoriya#switch#enabled('disable-vimdoc-ja')
-    let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]vimdoc-ja"'), ',')
-  endif
-  
-  " vimproc: 同梱のvimprocを無効化する
-  if kaoriya#switch#enabled('disable-vimproc')
-    let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]vimproc$"'), ',')
-  endif
-  
-  " go-extra: 同梱の vim-go-extra を無効化する
-  if kaoriya#switch#enabled('disable-go-extra')
-    let &rtp = join(filter(split(&rtp, ','), 'v:val !~ "[/\\\\]plugins[/\\\\]golang$"'), ',')
-  endif
-endif
-
 "----------------------------------------------------------------------------
 
 " swapファイルの出力先を変更する
-if !isdirectory($HOME . '/vimfiles/swap')
-  call mkdir($HOME . '/vimfiles/swap', 'p')
+if has('win32')
+  if !isdirectory($LOCALAPPDATA . '/Temp/vimfiles/swap')
+    call mkdir($LOCALAPPDATA . '/Temp/vimfiles/swap', 'p')
+  endif
+  set directory=$LOCALAPPDATA/Temp/vimfiles/swap
+else
+  set noswapfile
 endif
-set directory=$HOME/vimfiles/swap
 
 " backupファイルの出力先を変更する
-if !isdirectory($HOME . '/vimfiles/backup')
-  call mkdir($HOME . '/vimfiles/backup', 'p')
+if has('win32')
+  if !isdirectory($LOCALAPPDATA . '/Temp/vimfiles/backup')
+    call mkdir($LOCALAPPDATA . '/Temp/vimfiles/backup', 'p')
+  endif
+  set backupdir=$LOCALAPPDATA/Temp/vimfiles/backup
+else
+  set nobackup
 endif
-set backupdir=$HOME/vimfiles/backup
 
 " viminfoファイルの出力先を変更する
-if !has('nvim')
-  if !isdirectory($HOME . '/vimfiles/viminfo')
-    call mkdir($HOME . '/vimfiles/viminfo', 'p')
+if has('win32')
+  if !has('nvim')
+    if !isdirectory($LOCALAPPDATA . '/Temp/vimfiles/viminfo')
+      call mkdir($LOCALAPPDATA. '/Temp/vimfiles/viminfo', 'p')
+    endif
+    set viminfo+=n$LOCALAPPDATA/Temp/vimfiles/viminfo/viminfo
+  else
+    if !isdirectory($LOCALAPPDATA . 'Temp/vimfiles/nviminfo')
+      call mkdir($LOCALAPPDATA . '/Temp/vimfiles/nviminfo', 'p')
+    endif
+    set viminfo+=n$LOCALAPPDATA/Temp/vimfiles/nviminfo/viminfo
   endif
-  set viminfo+=n$HOME/vimfiles/viminfo/viminfo
-else
-  if !isdirectory($HOME . '/vimfiles/nviminfo')
-    call mkdir($HOME . '/vimfiles/nviminfo', 'p')
-  endif
-  set viminfo+=n$HOME/vimfiles/nviminfo/viminfo
 endif
 
 
 " undoファイルの出力先を変更する
-if !isdirectory($HOME . '/vimfiles/undo')
-  call mkdir($HOME . '/vimfiles/undo', 'p')
+if has('win32')
+  if !isdirectory($LOCALAPPDATA . '/Temp/vimfiles/undo')
+    call mkdir($LOCALAPPDATA . '/Temp/vimfiles/undo', 'p')
+  endif
+  set undodir=$LOCALAPPDATA/Temp/vimfiles/undo
+else
+  set noundofile
 endif
-set undodir=$HOME/vimfiles/undo
 
 " XMLのタグ自動補完
 augroup MyXML
